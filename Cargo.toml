@@ -1,0 +1,21 @@
+[workspace]
+members = [
+    "gramma-rs",
+    "examples/calc",
+    "examples/prefix-expr"
+]
+
+[package]
+name = "mt4"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+gramma-rs = { path = "gramma-rs" }
+
+[[bin]]
+name = "calc"
+path = "examples/calc/src/main.rs"
+
+[build-dependencies]
+gramma-rs = { path = "gramma-rs" }

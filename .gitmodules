@@ -1,0 +1,3 @@
+[submodule "gramma-rs"]
+	path = gramma-rs
+	url = https://github.com/EgorkaZ/gramma-rs.git

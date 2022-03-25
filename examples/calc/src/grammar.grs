@@ -1,0 +1,47 @@
+#![allow(non_snake_case)]
+grammar
+
+sym Expr : f64
+{ e:SubExpr => { e }
+}
+
+SubExpr : f64
+{ lhs:SubExpr Plus  rhs:Term => { lhs + rhs }
+, lhs:SubExpr Minus rhs:Term => { lhs - rhs }
+, t:Term => { t }
+, Minus t:Term => { -t }
+}
+
+Term : f64
+{ lhs:Term Star rhs:Fact => { lhs * rhs }
+, lhs:Term Div  rhs:Fact => { lhs / rhs }
+, f:Fact => { f }
+}
+
+Fact : f64
+{ LPar e:SubExpr RPar => { e }
+, n:Float => { n }
+}
+
+Float : f64
+{ f:Num Dot s:Num => { format!("{f}.{s}").parse().unwrap() }
+, n:Num => { n.parse().unwrap() }
+}
+
+grammar_end
+
+lexer
+
+tok Num = [0-9]+;
+
+tok Plus = "+";
+tok Star = "*";
+tok Minus = "-";
+tok Div = "/";
+
+tok Dot = ".";
+
+tok LPar = "(";
+tok RPar = ")";
+
+lexer_end

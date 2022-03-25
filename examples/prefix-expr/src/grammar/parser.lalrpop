@@ -1,0 +1,72 @@
+use std::str::FromStr;
+
+use crate::ast::{Producer, Tree, Action};
+
+grammar<'a>(producer: &'a Producer<'a>);
+
+pub Expr = IfThen;
+
+
+// compounds
+IfThen = {
+    "if" <c:LetExpr> <t:LetExpr> => producer.if_then_else(c, t, None),
+    LetExpr,
+};
+
+LetExpr = {
+    "let" <var:VarName> <val:LetExpr> <e:LetExpr> => producer.let_expr(<>),
+    "call" <LetExpr> <LetExpr> => producer.call(<>),
+    "look" <Action> <LetExpr> => producer.look(<>),
+    "if" <c:LetExpr> <t:LetExpr> <e:LetExpr> => producer.if_then_else(c, t, Some(e)),
+    LogicOp,
+};
+
+// operators
+LogicOp = {
+    "&" <LetExpr> <LetExpr> => producer.and(<>),
+    "|" <LetExpr> <LetExpr> => producer.or(<>),
+    "!" <LetExpr>           => producer.not(<>),
+    Compare,
+};
+
+Compare = {
+    "==" <LetExpr> <LetExpr> => producer.eq(<>),
+    "!=" <LetExpr> <LetExpr> => producer.ne(<>),
+    "<"  <LetExpr> <LetExpr> => producer.lt(<>),
+    ">"  <LetExpr> <LetExpr> => producer.gt(<>),
+    "<=" <LetExpr> <LetExpr> => producer.le(<>),
+    ">=" <LetExpr> <LetExpr> => producer.ge(<>),
+    Arith,
+};
+
+Arith = {
+    "*" <LetExpr> <LetExpr> => producer.mul(<>),
+    "/" <LetExpr> <LetExpr> => producer.div(<>),
+    "+" <LetExpr> <LetExpr> => producer.add(<>),
+    "-" <LetExpr> <LetExpr> => producer.sub(<>),
+    Prim,
+};
+
+// primal values
+Prim: &'a Tree<'a> = {
+    PureNum => producer.num(<>),
+    PureBool => producer.boolean(<>),
+    VarName => producer.var(<>),
+    Action => producer.action(<>),
+};
+
+PureNum: i32 = {
+    <s:r"[0-9]+"> => i32::from_str(s).unwrap(),
+};
+
+PureBool: bool = {
+    <s:r"True">  => true,
+    <s:r"False"> => false,
+};
+
+VarName: &'input str = r"[a-z_][a-zA-Z0-9_]*";
+
+// actions
+Action: Action<'a> = {
+    "print" <LetExpr> => producer.print(<>),
+};

@@ -1,0 +1,121 @@
+#![allow(non_snake_case)]
+use crate::ast::{Tree, Action, BinOper, UnOper, Primal};
+
+grammar
+
+sym Expr: Tree
+{ t:IfThen => { t }
+}
+
+IfThen: Tree
+{ If cond:LetExpr then:LetExpr => { Tree::IfThenElse(Box::new(cond), Box::new(then), None) }
+, l:LetExpr => { l }
+}
+
+LetExpr: Tree
+{ Let var:VarName val:LetExpr e:LetExpr => { Tree::Let(var, Box::new(val), Box::new(e)) }
+, Call fun:LetExpr arg:LetExpr => { Tree::FunCall(Box::new(fun), Box::new(arg)) }
+, Look act:Action after:LetExpr => { Tree::Look(act, Box::new(after)) }
+, If cond:LetExpr t:LetExpr e:LetExpr => { Tree::IfThenElse(Box::new(cond), Box::new(t), Some(Box::new(e))) }
+, l:LogicOp => { l }
+}
+
+LogicOp: Tree
+{ op:BiLogicOperator l:LetExpr r:LetExpr => { Tree::BinOp(op, Box::new(l), Box::new(r)) }
+, op:UnLogicOperator sub:LetExpr => { Tree::UnOp(op, Box::new(sub)) }
+, c:Compare => { c }
+}
+
+BiLogicOperator: BinOper
+{ And => { BinOper::And }
+, Or  => { BinOper::Or  }
+}
+
+UnLogicOperator: UnOper
+{ Not => { UnOper::Not }
+}
+
+Compare: Tree
+{ op:CmpOperator l:LetExpr r:LetExpr => { Tree::BinOp(op, Box::new(l), Box::new(r)) }
+, a:Arith => { a }
+}
+
+CmpOperator: BinOper
+{ Eq => { BinOper::Eq }
+, Ne => { BinOper::Ne }
+, Lt => { BinOper::Lt }
+, Gt => { BinOper::Gt }
+, Le => { BinOper::Le }
+, Ge => { BinOper::Ge }
+}
+
+Arith: Tree
+{ op:ArithOperator l:LetExpr r:LetExpr => { Tree::BinOp(op, Box::new(l), Box::new(r)) }
+, p:Prim => { p }
+}
+
+ArithOperator: BinOper
+{ Add => { BinOper::Add }
+, Sub => { BinOper::Sub }
+, Mul => { BinOper::Mul }
+, Div => { BinOper::Div }
+}
+
+Prim: Tree
+{ n:PureNum  => { Tree::Primal(n) }
+, b:PureBool => { Tree::Primal(b) }
+, v:VarName  => { Tree::Primal(Primal::Variable(v)) }
+, a:Action   => { Tree::Action(a) }
+}
+
+PureNum: Primal
+{ n:Num => { Primal::Numeric(n.parse().unwrap()) }
+}
+
+PureBool: Primal
+{ True  => { Primal::Bool(true) }
+, False => { Primal::Bool(false) }
+}
+
+Action: Action
+{ Print sub:LetExpr => { Action::Print(Box::new(sub)) }
+}
+
+grammar_end
+
+lexer
+
+tok If = "if";
+tok Let = "let";
+tok Call = "call";
+tok Look = "look";
+
+tok True = "True";
+tok False = "False";
+
+tok Print = "print";
+
+tok And = "&";
+tok Or  = "|";
+tok Not = "!";
+
+tok Eq = "==";
+tok Ne = "!=";
+tok Lt = "<";
+tok Gt = ">";
+tok Le = "<=";
+tok Ge = ">=";
+
+tok Add = "+";
+tok Sub = "-";
+tok Mul = "*";
+tok Div = "/";
+
+lCase = [a-z];
+uCase = [A-Z];
+digit = [0-9];
+
+tok VarName = { lCase, "_" } { lCase, uCase, digit, "_" }*;
+tok Num = digit+;
+
+lexer_end
