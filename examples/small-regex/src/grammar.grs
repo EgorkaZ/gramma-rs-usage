@@ -1,0 +1,36 @@
+#![allow(non_snake_case)]
+use crate::tree::Tree;
+
+fn mb_push<T>(mut vec: Vec<T>, mb_el: Option<T>) -> Vec<T>
+{
+    if let Some(el) = mb_el {
+        vec.push(el);
+    }
+    vec
+}
+
+grammar
+
+sym Regex: Tree
+{
+    c:Chars => { Tree::new("Regex", vec![c]) }
+}
+
+Chars: Tree
+{
+    single:char => { Tree::new("Chars", vec![Tree::singleton(&single)]) },
+    fst:char rest:Chars => { Tree::new("Chars", vec![Tree::singleton(&fst), rest]) }
+}
+
+grammar_end
+lexer
+
+tok char = [a-z];
+
+tok lPar = "(";
+tok rPar = ")";
+
+tok Or = "|";
+tok Star = "*";
+
+lexer_end
