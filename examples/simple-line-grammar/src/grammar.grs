@@ -1,0 +1,20 @@
+#![allow(non_snake_case)]
+
+grammar
+
+sym S: (usize, usize)
+{ f:B s:B => { (f, s) }
+}
+
+B: usize
+{ a b:B => { 1 + b }
+, b => { 0 }
+}
+
+grammar_end
+lexer
+
+tok a = "a";
+tok b = "b";
+
+lexer_end

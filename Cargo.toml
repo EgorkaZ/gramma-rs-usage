@@ -2,7 +2,9 @@
 members = [
     "gramma-rs",
     "examples/calc",
-    "examples/prefix-expr"
+    "examples/prefix-expr",
+    "examples/simple-line-grammar",
+    "examples/small-regex",
 ]
 
 [package]

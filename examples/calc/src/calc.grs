@@ -2,25 +2,21 @@
 grammar
 
 sym Expr : f64
-{ e:SubExpr => { e }
-}
-
-SubExpr : f64
-{ lhs:SubExpr Plus  rhs:Term => { lhs + rhs }
-, lhs:SubExpr Minus rhs:Term => { lhs - rhs }
-, t:Term => { t }
-, Minus t:Term => { -t }
+{ l:Expr Plus r:Term => { l + r }
+, l:Expr Minus r:Term => { l - r }
+, sub:Term => { sub }
+, Minus sub:Term => { -sub }
 }
 
 Term : f64
-{ lhs:Term Star rhs:Fact => { lhs * rhs }
-, lhs:Term Div  rhs:Fact => { lhs / rhs }
-, f:Fact => { f }
+{ l:Term Star r:Factor => { l * r }
+, l:Term Div r:Factor => { l / r }
+, sub:Factor => { sub }
 }
 
-Fact : f64
-{ LPar e:SubExpr RPar => { e }
-, n:Float => { n }
+Factor : f64
+{ f:Float => { f }
+, LPar sub:Expr RPar => { sub }
 }
 
 Float : f64
