@@ -7,26 +7,26 @@ fn create_parser_base() -> ParserBase
 {
 let dfa = {
     let states = vec![
-        (Some(UnitId(5)), vec![]),
-        (None, vec![(1, 2),(0, 0),]),
         (Some(UnitId(4)), vec![]),
+        (Some(UnitId(5)), vec![]),
+        (None, vec![(1, 0),(2, 1),]),
     ];
-    let start_state = 1;
+    let start_state = 2;
     let symbols = vec![
-        Str(StrEdge(String::from("b"))),
-        Str(StrEdge(String::from("a"))),
         Eps(EpsEdge),
+        Str(StrEdge(String::from("a"))),
+        Str(StrEdge(String::from("b"))),
     ];
 DFA::from_vecs(states, start_state, symbols)
 };
 let named_units = vec![
-    (String::from("b"), UnitId(5)),
-    (String::from("S"), UnitId(3)),
+    (String::from(":PseudoToken:"), UnitId(6)),
     (String::from("a"), UnitId(4)),
     (String::from("B"), UnitId(2)),
-    (String::from(":PseudoToken:"), UnitId(6)),
     (String::from("Eps"), UnitId(0)),
     (String::from("EOI"), UnitId(1)),
+    (String::from("S"), UnitId(3)),
+    (String::from("b"), UnitId(5)),
 ];
 let tokens = vec![
     (UnitId(0), true), 
@@ -56,7 +56,7 @@ pub struct SParser
 impl SParser
 {
     pub fn new() -> Self
-    { SParser{ base: create_parser_base() } }
+    { SParser{ base: create_parser_base().set_sym::<_Data, (usize, usize)>() } }
 
     pub fn parse<'this, 'input>(&'this self, to_parse: &'input str) -> Result<(usize, usize), ParseError<'this>>
     { self.base.create::<_Data, (usize, usize)>(to_parse).parse() }

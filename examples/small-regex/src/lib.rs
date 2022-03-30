@@ -10,7 +10,7 @@ extern crate graphviz_rust;
 mod tests {
     use std::iter;
 
-    use crate::{parser::parse};
+    use crate::{parser::parse, grammar::RegexParser};
 
     use super::lexer::*;
 
@@ -47,18 +47,30 @@ mod tests {
     }
 
     fn check_ok(s: &str)
-    { assert!(parse(s.chars()).is_ok()) }
+    {
+        let parser = RegexParser::new();
+        match parser.parse(s) {
+            Ok(_) => (),
+            Err(err) => panic!("Couldn't parse '{s}': {err}"),
+        }
+    }
 
     fn check_fail(s: &str)
-    { assert!(parse(s.chars()).is_err()) }
+    {
+        let parser = RegexParser::new();
+        match parser.parse(s) {
+            Ok(res) => panic!("Unexpectedly parsed '{s}': {res:?}"),
+            Err(_) => (),
+        }
+    }
 
     #[test]
     fn parse_good()
     {
-        check_ok("");
+        // check_ok("");
         check_ok("a*");
         check_ok("(a*)*");
-        check_ok("((a*)с)*");
+        check_ok("((a*)c)*");
         check_ok("hell0");
         check_ok("(hell*o)|(w(or(l)))d");
         check_ok("ab|c*(de)");

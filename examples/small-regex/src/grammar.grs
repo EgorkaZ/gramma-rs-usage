@@ -1,31 +1,58 @@
 #![allow(non_snake_case)]
 use crate::tree::Tree;
 
-fn mb_push<T>(mut vec: Vec<T>, mb_el: Option<T>) -> Vec<T>
+fn parens_tree(name: &str, sub: Tree) -> Tree
 {
-    if let Some(el) = mb_el {
-        vec.push(el);
-    }
-    vec
+    let l_par = Tree::singleton("(");
+    let r_par = Tree::singleton(")");
+    Tree::new(name, vec![l_par, sub, r_par])
 }
 
 grammar
 
 sym Regex: Tree
 {
-    c:Chars => { Tree::new("Regex", vec![c]) }
+    ne:NonEmpty => { Tree::new("Regex", vec![ne]) }
 }
 
-Chars: Tree
+NonEmpty: Tree
 {
-    single:char => { Tree::new("Chars", vec![Tree::singleton(&single)]) },
-    fst:char rest:Chars => { Tree::new("Chars", vec![Tree::singleton(&fst), rest]) }
+    lhs:NonEmpty Or rhs:Concat => {
+        Tree::new("NonEmpty", vec![
+            lhs,
+            Tree::singleton("|"),
+            Tree::new("Concat", rhs)
+        ])
+    },
+    cc:Concat => { Tree::new("NonEmpty", cc) }
+}
+
+Concat: Vec<Tree>
+{
+    cc:Concat next:Kleene => {
+        let mut cc = cc;
+        cc.push(next);
+        cc
+    },
+    sub:Kleene => { vec![sub] }
+}
+
+Kleene: Tree
+{
+    sub:SubConcat Star => { Tree::new("Kleene", vec![sub, Tree::singleton("*")]) },
+    sub:SubConcat => { Tree::new("Kleene", vec![sub]) }
+}
+
+SubConcat: Tree
+{
+    ch:char => { Tree::singleton(&ch) },
+    lPar sub:NonEmpty rPar => { parens_tree("SubConcat", sub) }
 }
 
 grammar_end
 lexer
 
-tok char = [a-z];
+tok char = { [a-z], [0-9] };
 
 tok lPar = "(";
 tok rPar = ")";

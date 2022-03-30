@@ -51,7 +51,10 @@ mod tests
         .map(|(line, expected)| (line, parser.parse(line), expected))
         .for_each(|(line, res, expected)| match res {
             Ok(res) => assert_eq!(res, expected),
-            Err(err) => panic!("Parse error for '{line}': {err}"),
+            Err(err) => {
+                parser.dump_info();
+                panic!("Parse error for '{line}': {err}")
+            },
         });
     }
 }

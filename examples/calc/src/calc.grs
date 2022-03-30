@@ -5,7 +5,6 @@ sym Expr : f64
 { l:Expr Plus r:Term => { l + r }
 , l:Expr Minus r:Term => { l - r }
 , sub:Term => { sub }
-, Minus sub:Term => { -sub }
 }
 
 Term : f64
@@ -15,8 +14,13 @@ Term : f64
 }
 
 Factor : f64
-{ f:Float => { f }
+{ f:NegFloat => { f }
 , LPar sub:Expr RPar => { sub }
+}
+
+NegFloat : f64
+{ Minus f:Float => { -f }
+, f:Float => { f }
 }
 
 Float : f64
