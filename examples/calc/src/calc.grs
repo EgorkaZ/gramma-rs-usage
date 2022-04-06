@@ -14,13 +14,13 @@ Term : f64
 }
 
 Factor : f64
-{ f:NegFloat => { f }
-, LPar sub:Expr RPar => { sub }
+{ Minus sub:Negative => { -sub }
+, sub:Negative => { sub }
 }
 
-NegFloat : f64
-{ Minus f:Float => { -f }
-, f:Float => { f }
+Negative : f64
+{ f:Float => { f }
+, LPar sub:Expr RPar => { sub }
 }
 
 Float : f64

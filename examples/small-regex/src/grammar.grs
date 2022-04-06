@@ -12,7 +12,8 @@ grammar
 
 sym Regex: Tree
 {
-    ne:NonEmpty => { Tree::new("Regex", vec![ne]) }
+    ne:NonEmpty => { Tree::new("Regex", vec![ne]) },
+    Eps => { Tree::new("Regex", vec![Tree::singleton("eps")]) }
 }
 
 NonEmpty: Tree

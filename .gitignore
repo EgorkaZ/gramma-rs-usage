@@ -3,3 +3,7 @@ Cargo.lock
 .vscode/
 .idea/
 out.svg
+examples/calc/src/calc.rs
+examples/prefix-expr/src/grammar/parser.rs
+examples/simple-line-grammar/src/grammar.rs
+examples/small-regex/src/grammar.rs

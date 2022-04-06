@@ -67,7 +67,7 @@ mod tests {
     #[test]
     fn parse_good()
     {
-        // check_ok("");
+        check_ok("");
         check_ok("a*");
         check_ok("(a*)*");
         check_ok("((a*)c)*");
