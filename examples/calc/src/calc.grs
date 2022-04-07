@@ -8,13 +8,18 @@ sym Expr : f64
 }
 
 Term : f64
-{ l:Term Star r:Factor => { l * r }
-, l:Term Div r:Factor => { l / r }
+{ l:Term Star r:Power => { l * r }
+, l:Term Div r:Power => { l / r }
+, sub:Power => { sub }
+}
+
+Power : f64
+{ l:Factor Pow r:Power => { l.powf(r) }
 , sub:Factor => { sub }
 }
 
 Factor : f64
-{ Minus sub:Negative => { -sub }
+{ Minus sub:Factor => { -sub }
 , sub:Negative => { sub }
 }
 
@@ -38,6 +43,7 @@ tok Plus = "+";
 tok Star = "*";
 tok Minus = "-";
 tok Div = "/";
+tok Pow = "**";
 
 tok Dot = ".";
 
